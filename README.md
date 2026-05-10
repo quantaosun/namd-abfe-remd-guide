@@ -4,9 +4,10 @@ This repository provides a comprehensive guide for compiling NAMD 3.0.2 from sou
 
 ## Table of Contents
 1. [Compiling NAMD 3.0.2 for Replica Exchange](#1-compiling-namd-302-for-replica-exchange)
-2. [Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs](#2-adapting-charmm-gui-abfe-scripts-for-fewer-cpus)
-3. [Running the ABFE Workflow](#3-running-the-abfe-workflow)
-4. [Analysis and Free Energy Calculation](#4-analysis-and-free-energy-calculation)
+2. [CPU Advisor: How Many Replicas Should I Use?](#2-cpu-advisor-how-many-replicas-should-i-use)
+3. [Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs](#3-adapting-charmm-gui-abfe-scripts-for-fewer-cpus)
+4. [Running the ABFE Workflow](#4-running-the-abfe-workflow)
+5. [Analysis and Free Energy Calculation](#5-analysis-and-free-energy-calculation)
 
 ---
 
@@ -68,7 +69,63 @@ The resulting binary `namd3` and the Charm++ launcher `charmrun` (located in `ch
 
 ---
 
-## 2. Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs
+## 2. CPU Advisor: How Many Replicas Should I Use?
+
+`lscpu` reports **logical CPUs**, which includes hyperthreaded virtual cores. For MD simulations, only **physical cores** provide real floating-point throughput. Using hyperthreaded logical CPUs does not speed up NAMD and can slow it down due to cache contention.
+
+The `scripts/namd_cpu_advisor.py` utility automatically parses `lscpu` output, extracts the physical core count, and recommends the optimal `+replicas` / `+p` configuration.
+
+### Usage
+```bash
+# Auto-detect from lscpu (Linux)
+python3 scripts/namd_cpu_advisor.py
+
+# Parse a saved lscpu output file
+python3 scripts/namd_cpu_advisor.py --lscpu-file /path/to/lscpu.txt
+
+# Override manually if you know your physical core count
+python3 scripts/namd_cpu_advisor.py --physical-cores 14
+```
+
+### Example: Machine with 28 logical CPUs (14 physical cores, hyperthreading ON)
+```
+=================================================================
+  NAMD ABFE REMD — CPU Configuration Advisor
+=================================================================
+  Logical CPUs (lscpu)   : 28
+  Threads per core       : 2  (hyperthreading enabled)
+  Sockets                : 1
+  *** Physical cores     : 14  ← use this for NAMD ***
+
+  NOTE: lscpu reports 28 logical CPUs, but only 14
+  are real physical cores. Using all 28 logical CPUs would
+  NOT speed up NAMD and may slow it down due to cache contention.
+  Always set +p14 (physical cores only).
+
+  Valid configurations for +p14:
+
+  Rank  +replicas    +p       PE/replica     Recommendation
+  ---- ----------- ------- ------------- -----------------------------------
+  1     7            14       2              <-- BEST (most accurate + fast)
+  2     2            14       7              <-- Good alternative
+  3     14           14       1              Works; each replica single-threaded (slow)
+
+  RECOMMENDED LAUNCH COMMAND:
+    charmrun ++local +p14 namd3 \\
+      +replicas 7 fep_site.conf \\
+      --source FEP_remd_softcore.namd \\
+      +stdout output_site/%d/job0.%d.log
+=================================================================
+```
+
+### Ranking Logic
+The advisor ranks configurations by two criteria, in order:
+1. **PE per replica ≥ 2** is preferred over 1 PE per replica. Each replica's MD simulation runs faster when it has at least 2 threads.
+2. **More replicas** is preferred over fewer (within the same PE group), because more lambda windows improve phase-space overlap and BAR accuracy.
+
+---
+
+## 3. Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs
 
 The default CHARMM-GUI ABFE workflow uses **32 replicas** (lambda windows). NAMD's `+replicas N` flag requires that the total number of Processing Elements (PEs) is a multiple of N. If you have fewer than 32 CPUs (e.g., a 4-core or 8-core workstation), you cannot run 32 replicas efficiently.
 

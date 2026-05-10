@@ -1,0 +1,31 @@
+# NAMD output files
+*.dcd
+*.coor
+*.vel
+*.xsc
+*.xst
+*.log
+*.fepout
+*.history
+*.sort.history
+
+# NAMD restart files
+*.restart.*
+*.tcl
+
+# Build artifacts
+*.o
+*.a
+*.so
+
+# Compiled NAMD binaries
+namd3
+charmrun
+
+# Large input/source archives
+*.tar.gz
+*.tgz
+
+# OS files
+.DS_Store
+Thumbs.db

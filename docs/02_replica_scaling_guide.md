@@ -12,16 +12,32 @@ On a workstation with 4–16 CPUs, running 32 replicas is either impossible or e
 
 ## Scientific Impact of Reducing Replicas
 
-Reducing the number of replicas (lambda windows) has the following effects:
+A common question is: **If I reduce the number of simultaneous replicas from 32 to 7 or 14, does it reduce the accuracy of the final free energy?**
 
-| Aspect | Impact |
-| :--- | :--- |
-| **Phase-space overlap** | Fewer windows means larger gaps between adjacent lambda values, potentially reducing overlap and increasing statistical error |
-| **Exchange acceptance ratio** | Wider lambda spacing typically lowers the probability of successful replica exchanges |
-| **Convergence** | Fewer windows may require longer simulation time per window to achieve the same level of convergence |
-| **Accuracy** | The free energy estimate may be less accurate, but the simulation remains physically valid |
+The short answer is: **No, the theoretical accuracy remains exactly the same, but the *rate of convergence* decreases.**
 
-For a quick test or a system with a small ligand (few rotatable bonds, low charge), 4–8 replicas can still produce qualitatively meaningful results. For production calculations, 16–32 replicas are recommended.
+### The Difference Between $\lambda$ Windows and Replicas
+It is crucial to distinguish between the two:
+- **$\lambda$ Windows:** The discrete states along the alchemical pathway (e.g., $\lambda = 0.00, 0.03, \dots, 1.00$). The CHARMM-GUI scripts define 32 fixed $\lambda$ windows. **This repository does not change the number of $\lambda$ windows.**
+- **Replicas:** The number of independent MD simulations running simultaneously and exchanging states.
+
+### How Fewer Replicas Affects the Simulation
+When you run `+replicas 7` on a system with 32 $\lambda$ windows, NAMD uses a technique called **sparse replica exchange** or **window hopping**. Instead of having one replica sitting at every single $\lambda$ window simultaneously, you have 7 replicas moving up and down the 32-window ladder.
+
+According to the literature on Hamiltonian Replica Exchange Molecular Dynamics (H-REMD) and FEP [1, 2]:
+1. **Thermodynamic Accuracy:** The Bennett Acceptance Ratio (BAR) calculation relies on the phase space overlap between adjacent $\lambda$ windows. Because all 32 $\lambda$ windows are still sampled (just sequentially rather than simultaneously), the phase space overlap is preserved. The final $\Delta G$ will converge to the exact same value.
+2. **Convergence Rate:** The primary benefit of having 32 replicas is that a conformation can "travel" from $\lambda=0$ to $\lambda=1$ very quickly via rapid exchanges, helping the system escape kinetic traps (e.g., a buried water molecule or a trapped sidechain rotamer) [1]. With fewer replicas, the "round-trip time" for a replica to traverse the entire $\lambda$ space increases.
+3. **Sampling Efficiency:** To achieve the same level of statistical convergence (i.e., the same error bar in kcal/mol) with fewer replicas, you generally need to run the simulation for **more MD steps per replica**.
+
+**Recommendation:** If you reduce the replica count significantly (e.g., from 32 to 4 or 7), you should compensate by increasing the simulation time. In the `FEP_remd_softcore.namd` script, increase `num_runs` or `steps_per_run` to ensure each replica spends enough time sampling the $\lambda$ space.
+
+---
+
+## References
+
+[1] Jiang, W., & Roux, B. (2010). Free Energy Perturbation Hamiltonian Replica-Exchange Molecular Dynamics (FEP/H-REMD) for Absolute Ligand Binding Free Energy Calculations. *Journal of Chemical Theory and Computation*, 6(9), 2559–2565. https://doi.org/10.1021/ct1001768
+
+[2] Jiang, W., Thirman, J., Jo, S., & Roux, B. (2018). Reduced Free Energy Perturbation/Hamiltonian Replica Exchange Molecular Dynamics Method with Unbiased Alchemical Thermodynamic Axis. *The Journal of Physical Chemistry B*, 122(41), 9435–9442. https://doi.org/10.1021/acs.jpcb.8b03277
 
 ## Complete List of Files to Modify
 

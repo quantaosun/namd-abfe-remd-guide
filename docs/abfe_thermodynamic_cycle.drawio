@@ -1,105 +1,71 @@
-<mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+<mxGraphModel dx="1422" dy="762" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1600" pageHeight="980" math="0" shadow="0">
   <root>
     <mxCell id="0" />
     <mxCell id="1" parent="0" />
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- TITLE -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <mxCell id="title" value="Absolute Binding Free Energy (ABFE) — Alchemical Thermodynamic Cycle" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1A252F;" vertex="1" parent="1">
-      <mxGeometry x="200" y="20" width="1200" height="40" as="geometry" />
+      <mxGeometry x="100" y="18" width="1400" height="40" as="geometry" />
     </mxCell>
 
-    <!-- Central equation -->
-    <mxCell id="eq" value="ΔG&lt;sub&gt;bind&lt;/sub&gt; = ΔG&lt;sub&gt;site&lt;/sub&gt; − ΔG&lt;sub&gt;solv&lt;/sub&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5EEF8;strokeColor=#7D3C98;fontStyle=1;fontSize=14;fontColor=#7D3C98;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="580" y="70" width="440" height="44" as="geometry" />
-    </mxCell>
-
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- ROW 1: PHYSICAL STATES -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <mxCell id="row1label" value="Physical States" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#717D7E;" vertex="1" parent="1">
-      <mxGeometry x="20" y="155" width="100" height="60" as="geometry" />
-    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ROW 1: PHYSICAL STATES                                  -->
+    <!-- ═══════════════════════════════════════════════════════ -->
 
     <!-- State A: Bound complex -->
-    <mxCell id="stateA" value="&lt;b&gt;Protein · Ligand  [P·L]&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand bound in protein pocket&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="130" y="140" width="320" height="80" as="geometry" />
+    <mxCell id="stateA" value="&lt;b&gt;Protein · Ligand  [P·L]&lt;/b&gt;&lt;br&gt;Ligand bound in protein pocket&lt;br&gt;(fully interacting, λ = 0)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="80" y="80" width="300" height="90" as="geometry" />
     </mxCell>
 
     <!-- State B: Unbound -->
-    <mxCell id="stateB" value="&lt;b&gt;Protein + Ligand  [P + L]&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand free in solution&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="1150" y="140" width="320" height="80" as="geometry" />
+    <mxCell id="stateB" value="&lt;b&gt;Protein + Ligand  [P + L]&lt;/b&gt;&lt;br&gt;Ligand free in solution&lt;br&gt;(fully interacting, λ = 0)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D6EAF8;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="1220" y="80" width="300" height="90" as="geometry" />
     </mxCell>
 
     <!-- Real binding arrow (dashed, not directly simulated) -->
-    <mxCell id="bindArrow" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;strokeColor=#7D3C98;strokeWidth=2;" edge="1" source="stateA" target="stateB" parent="1">
+    <mxCell id="bindArrow" value="ΔG_bind  (target — not directly simulated)" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;strokeColor=#7D3C98;strokeWidth=2;fontSize=11;fontStyle=2;fontColor=#7D3C98;align=center;" edge="1" source="stateA" target="stateB" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="bindLabel" value="ΔG&lt;sub&gt;bind&lt;/sub&gt; (target — not directly simulated)" style="edgeLabel;html=1;align=center;verticalAlign=bottom;resizable=0;points=[];fontSize=10;fontStyle=2;fontColor=#7D3C98;" vertex="1" connectable="0" parent="bindArrow">
-      <mxGeometry x="-0.05" y="-1" relative="1" as="geometry"><Array as="offset"><mxPoint x="0" y="-14" /></Array></mxGeometry>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ROW 2: ALCHEMICAL LEGS (two separate horizontal rows)   -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <!-- --- LEG 1: Complex (site) --- -->
+    <mxCell id="leg1header" value="LEG 1 — Complex (Site)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#2980B9;fontStyle=1;fontSize=13;fontColor=#2980B9;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="80" y="220" width="620" height="36" as="geometry" />
     </mxCell>
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- ROW 2: ALCHEMICAL LEGS -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <mxCell id="row2label" value="Alchemical Legs" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#717D7E;" vertex="1" parent="1">
-      <mxGeometry x="20" y="340" width="100" height="60" as="geometry" />
+    <mxCell id="leg1_l0" value="&lt;b&gt;[P·L]  λ = 0&lt;/b&gt;&lt;br&gt;Ligand fully coupled&lt;br&gt;in protein pocket" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="80" y="268" width="200" height="80" as="geometry" />
     </mxCell>
 
-    <!-- ─── LEG 1 header ─── -->
-    <mxCell id="leg1header" value="LEG 1: Complex (site)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#2980B9;fontStyle=1;fontSize=12;fontColor=#2980B9;arcSize=30;" vertex="1" parent="1">
-      <mxGeometry x="130" y="290" width="580" height="36" as="geometry" />
+    <mxCell id="leg1_l1" value="&lt;b&gt;[P·L*]  λ = 1&lt;/b&gt;&lt;br&gt;Ligand decoupled&lt;br&gt;(ghost in pocket)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#95A5A6;fontColor=#717D7E;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="500" y="268" width="200" height="80" as="geometry" />
     </mxCell>
 
-    <!-- LEG 1: λ=0 box -->
-    <mxCell id="leg1_l0" value="&lt;b&gt;[P·L]  λ = 0&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand fully coupled&lt;br&gt;in protein pocket&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EBF5FB;strokeColor=#2980B9;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="130" y="340" width="220" height="90" as="geometry" />
-    </mxCell>
-
-    <!-- LEG 1: λ=1 box -->
-    <mxCell id="leg1_l1" value="&lt;b&gt;[P·L*]  λ = 1&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand decoupled&lt;br&gt;(ghost in pocket)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#95A5A6;fontColor=#717D7E;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="490" y="340" width="220" height="90" as="geometry" />
-    </mxCell>
-
-    <!-- LEG 1: FEP arrow -->
-    <mxCell id="leg1arrow" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#2980B9;strokeWidth=2.5;" edge="1" source="leg1_l0" target="leg1_l1" parent="1">
+    <mxCell id="leg1arrow" value="−ΔG_site_elec − ΔG_site_vdw − ΔG_restr_on" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#2980B9;strokeWidth=2.5;fontSize=11;fontStyle=1;fontColor=#2980B9;align=center;" edge="1" source="leg1_l0" target="leg1_l1" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="leg1arrowLabel1" value="−ΔG&lt;sub&gt;site&lt;/sub&gt;" style="edgeLabel;html=1;align=center;verticalAlign=bottom;resizable=0;points=[];fontSize=12;fontStyle=1;fontColor=#2980B9;" vertex="1" connectable="0" parent="leg1arrow">
-      <mxGeometry x="0" y="-1" relative="1" as="geometry"><Array as="offset"><mxPoint x="0" y="-16" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="leg1arrowLabel2" value="32 λ-windows · REMD · BAR" style="edgeLabel;html=1;align=center;verticalAlign=top;resizable=0;points=[];fontSize=9;fontStyle=2;fontColor=#555555;" vertex="1" connectable="0" parent="leg1arrow">
-      <mxGeometry x="0" y="0" relative="1" as="geometry"><Array as="offset"><mxPoint x="0" y="14" /></Array></mxGeometry>
+
+    <!-- --- LEG 2: Solvation (solv) --- -->
+    <mxCell id="leg2header" value="LEG 2 — Solvation (Solv)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontStyle=1;fontSize=13;fontColor=#1E8449;arcSize=30;" vertex="1" parent="1">
+      <mxGeometry x="900" y="220" width="620" height="36" as="geometry" />
     </mxCell>
 
-    <!-- ─── LEG 2 header ─── -->
-    <mxCell id="leg2header" value="LEG 2: Solvation (solv)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontStyle=1;fontSize=12;fontColor=#1E8449;arcSize=30;" vertex="1" parent="1">
-      <mxGeometry x="890" y="290" width="580" height="36" as="geometry" />
+    <mxCell id="leg2_l0" value="&lt;b&gt;[L]  λ = 0&lt;/b&gt;&lt;br&gt;Ligand fully coupled&lt;br&gt;in water" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="900" y="268" width="200" height="80" as="geometry" />
     </mxCell>
 
-    <!-- LEG 2: λ=0 box -->
-    <mxCell id="leg2_l0" value="&lt;b&gt;[L]  λ = 0&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand fully coupled&lt;br&gt;in water&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontColor=#1A252F;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="890" y="340" width="220" height="90" as="geometry" />
+    <mxCell id="leg2_l1" value="&lt;b&gt;[L*]  λ = 1&lt;/b&gt;&lt;br&gt;Ligand decoupled&lt;br&gt;(ghost in water)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#95A5A6;fontColor=#717D7E;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="1320" y="268" width="200" height="80" as="geometry" />
     </mxCell>
 
-    <!-- LEG 2: λ=1 box -->
-    <mxCell id="leg2_l1" value="&lt;b&gt;[L*]  λ = 1&lt;/b&gt;&lt;br&gt;&lt;i&gt;Ligand decoupled&lt;br&gt;(ghost in water)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F2F3F4;strokeColor=#95A5A6;fontColor=#717D7E;fontSize=12;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="1250" y="340" width="220" height="90" as="geometry" />
-    </mxCell>
-
-    <!-- LEG 2: FEP arrow -->
-    <mxCell id="leg2arrow" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#1E8449;strokeWidth=2.5;" edge="1" source="leg2_l0" target="leg2_l1" parent="1">
+    <mxCell id="leg2arrow" value="−ΔG_solv_elec − ΔG_solv_vdw" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#1E8449;strokeWidth=2.5;fontSize=11;fontStyle=1;fontColor=#1E8449;align=center;" edge="1" source="leg2_l0" target="leg2_l1" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
-    <mxCell id="leg2arrowLabel1" value="−ΔG&lt;sub&gt;solv&lt;/sub&gt;" style="edgeLabel;html=1;align=center;verticalAlign=bottom;resizable=0;points=[];fontSize=12;fontStyle=1;fontColor=#1E8449;" vertex="1" connectable="0" parent="leg2arrow">
-      <mxGeometry x="0" y="-1" relative="1" as="geometry"><Array as="offset"><mxPoint x="0" y="-16" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="leg2arrowLabel2" value="32 λ-windows · REMD · BAR" style="edgeLabel;html=1;align=center;verticalAlign=top;resizable=0;points=[];fontSize=9;fontStyle=2;fontColor=#555555;" vertex="1" connectable="0" parent="leg2arrow">
-      <mxGeometry x="0" y="0" relative="1" as="geometry"><Array as="offset"><mxPoint x="0" y="14" /></Array></mxGeometry>
-    </mxCell>
 
-    <!-- Vertical connectors: physical → alchemical -->
+    <!-- Vertical connectors: physical states → leg headers -->
     <mxCell id="vc1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;strokeColor=#BDC3C7;strokeWidth=1.5;" edge="1" source="stateA" target="leg1header" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
@@ -107,104 +73,110 @@
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- LAMBDA WINDOW STRIP (centre) -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <mxCell id="lambdaLabel" value="λ-windows: REMD exchanges between adjacent windows (0.00 → 0.06 → 0.12 → ... → 0.94 → 1.00)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=2;fontColor=#2C3E50;" vertex="1" parent="1">
-      <mxGeometry x="400" y="460" width="800" height="24" as="geometry" />
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ROW 3: LAMBDA WINDOW STRIP                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <mxCell id="lambdaTitle" value="λ-Windows: REMD exchanges configurations between adjacent windows at each step" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="300" y="390" width="1000" height="24" as="geometry" />
     </mxCell>
 
-    <!-- Lambda strip boxes (9 representative windows) -->
-    <mxCell id="lw0" value="λ=0.00" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C0392B;strokeColor=#922B21;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="400" y="490" width="76" height="34" as="geometry" />
+    <!-- 9 representative lambda window boxes, evenly spaced, no overlap -->
+    <mxCell id="lw0" value="λ=0.00" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C0392B;strokeColor=#922B21;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="300" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw1" value="λ=0.12" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E67E22;strokeColor=#A04000;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="490" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw1" value="λ=0.14" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E67E22;strokeColor=#A04000;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="430" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw2" value="λ=0.25" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1C40F;strokeColor=#9A7D0A;fontColor=#1A252F;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="580" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw2" value="λ=0.28" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F1C40F;strokeColor=#9A7D0A;fontColor=#1A252F;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="560" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw3" value="λ=0.38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#A9D18E;strokeColor=#538135;fontColor=#1A252F;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="670" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw3" value="λ=0.43" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#27AE60;strokeColor=#1E8449;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="690" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw4" value="λ=0.50" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#27AE60;strokeColor=#1E8449;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="760" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw4" value="λ=0.50" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ABC9C;strokeColor=#148F77;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="820" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw5" value="λ=0.62" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1ABC9C;strokeColor=#148F77;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="850" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw5" value="λ=0.64" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2980B9;strokeColor=#1A5276;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="950" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw6" value="λ=0.75" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2980B9;strokeColor=#1A5276;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="940" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw6" value="λ=0.78" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8E44AD;strokeColor=#6C3483;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="1080" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw7" value="λ=0.88" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8E44AD;strokeColor=#6C3483;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="1030" y="490" width="76" height="34" as="geometry" />
+    <mxCell id="lw7" value="λ=0.92" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="1210" y="420" width="90" height="36" as="geometry" />
     </mxCell>
-    <mxCell id="lw8" value="λ=1.00" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2C3E50;strokeColor=#1A252F;fontColor=#FFFFFF;fontSize=9;fontStyle=1;arcSize=20;" vertex="1" parent="1">
-      <mxGeometry x="1120" y="490" width="76" height="34" as="geometry" />
-    </mxCell>
-
-    <!-- Double-headed arrows between lambda windows -->
-    <mxCell id="la01" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="476" y="507" /></Array><Array as="targetPoint"><mxPoint x="490" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la12" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="566" y="507" /></Array><Array as="targetPoint"><mxPoint x="580" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la23" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="656" y="507" /></Array><Array as="targetPoint"><mxPoint x="670" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la34" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="746" y="507" /></Array><Array as="targetPoint"><mxPoint x="760" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la45" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="836" y="507" /></Array><Array as="targetPoint"><mxPoint x="850" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la56" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="926" y="507" /></Array><Array as="targetPoint"><mxPoint x="940" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la67" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="1016" y="507" /></Array><Array as="targetPoint"><mxPoint x="1030" y="507" /></Array></mxGeometry>
-    </mxCell>
-    <mxCell id="la78" value="" style="endArrow=block;startArrow=block;endFill=0;startFill=0;strokeColor=#888888;strokeWidth=1;" edge="1" parent="1">
-      <mxGeometry relative="1" as="geometry"><Array as="sourcePoint"><mxPoint x="1106" y="507" /></Array><Array as="targetPoint"><mxPoint x="1120" y="507" /></Array></mxGeometry>
+    <mxCell id="lw8" value="λ=1.00" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1A252F;strokeColor=#000000;fontColor=#FFFFFF;fontSize=10;fontStyle=1;arcSize=20;" vertex="1" parent="1">
+      <mxGeometry x="1340" y="420" width="90" height="36" as="geometry" />
     </mxCell>
 
-    <!-- Coupled / Decoupled labels under strip -->
-    <mxCell id="coupledLabel" value="coupled (λ=0)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=9;fontStyle=2;fontColor=#C0392B;" vertex="1" parent="1">
-      <mxGeometry x="380" y="528" width="110" height="20" as="geometry" />
+    <!-- Exchange arrows between lambda boxes — placed BETWEEN boxes, not overlapping -->
+    <mxCell id="ex01" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="393" y="425" width="34" height="26" as="geometry" />
     </mxCell>
-    <mxCell id="decoupledLabel" value="decoupled (λ=1)" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=9;fontStyle=2;fontColor=#2C3E50;" vertex="1" parent="1">
-      <mxGeometry x="1110" y="528" width="110" height="20" as="geometry" />
+    <mxCell id="ex12" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="523" y="425" width="34" height="26" as="geometry" />
     </mxCell>
-
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- ROW 3: NAMD WORKFLOW STEPS -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <mxCell id="row3label" value="NAMD Workflow" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=2;fontColor=#717D7E;" vertex="1" parent="1">
-      <mxGeometry x="20" y="600" width="100" height="70" as="geometry" />
+    <mxCell id="ex23" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="653" y="425" width="34" height="26" as="geometry" />
     </mxCell>
-
-    <!-- Step 1: Equilibration -->
-    <mxCell id="step1" value="&lt;b&gt;Step 1&lt;br&gt;Equilibration&lt;/b&gt;&lt;br&gt;&lt;i&gt;equ_site.namd&lt;br&gt;equ_solv.namd&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="130" y="590" width="240" height="90" as="geometry" />
+    <mxCell id="ex34" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="783" y="425" width="34" height="26" as="geometry" />
     </mxCell>
-
-    <!-- Step 2: REMD FEP Run -->
-    <mxCell id="step2" value="&lt;b&gt;Step 2&lt;br&gt;REMD FEP Run&lt;/b&gt;&lt;br&gt;&lt;i&gt;namd3 +replicas N&lt;br&gt;FEP_remd_softcore.namd&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#D35400;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="460" y="590" width="240" height="90" as="geometry" />
+    <mxCell id="ex45" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="913" y="425" width="34" height="26" as="geometry" />
     </mxCell>
-
-    <!-- Step 3: Sort Replicas -->
-    <mxCell id="step3" value="&lt;b&gt;Step 3&lt;br&gt;Sort Replicas&lt;/b&gt;&lt;br&gt;&lt;i&gt;sort_replicas.py&lt;br&gt;(un-shuffle λ trajectories)&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="790" y="590" width="240" height="90" as="geometry" />
+    <mxCell id="ex56" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="1043" y="425" width="34" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="ex67" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="1173" y="425" width="34" height="26" as="geometry" />
+    </mxCell>
+    <mxCell id="ex78" value="⇌" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=14;fontColor=#888888;" vertex="1" parent="1">
+      <mxGeometry x="1303" y="425" width="34" height="26" as="geometry" />
     </mxCell>
 
-    <!-- Step 4: BAR Analysis -->
-    <mxCell id="step4" value="&lt;b&gt;Step 4&lt;br&gt;BAR Analysis&lt;/b&gt;&lt;br&gt;&lt;i&gt;calc_bar_fe.py&lt;br&gt;ΔG&lt;sub&gt;site&lt;/sub&gt;, ΔG&lt;sub&gt;solv&lt;/sub&gt; → ΔG&lt;sub&gt;bind&lt;/sub&gt;&lt;/i&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5EEF8;strokeColor=#7D3C98;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="1120" y="590" width="240" height="90" as="geometry" />
+    <!-- Labels under lambda strip -->
+    <mxCell id="coupledLbl" value="fully coupled" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=9;fontStyle=2;fontColor=#C0392B;" vertex="1" parent="1">
+      <mxGeometry x="290" y="458" width="110" height="18" as="geometry" />
+    </mxCell>
+    <mxCell id="decoupledLbl" value="fully decoupled" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=9;fontStyle=2;fontColor=#1A252F;" vertex="1" parent="1">
+      <mxGeometry x="1330" y="458" width="110" height="18" as="geometry" />
     </mxCell>
 
-    <!-- Arrows between steps -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ROW 4: RESTRAINT CORRECTION                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <mxCell id="restrBox" value="&lt;b&gt;Restraint Correction (required to remove artefact energy from decoupling)&lt;/b&gt;&lt;br&gt;① ΔG_restr_on: free energy cost of applying DBC restraints while ligand is still interacting (computed numerically from simulation)&lt;br&gt;② ΔG_restr_analytical: Boresch standard-state correction — releases restrained ghost ligand to 1 M standard concentration (computed analytically from force constants)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#D35400;fontColor=#1A252F;fontSize=11;arcSize=10;align=left;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="300" y="490" width="1000" height="90" as="geometry" />
+    </mxCell>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- ROW 5: NAMD WORKFLOW STEPS                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+
+    <mxCell id="wfLabel" value="NAMD / CHARMM-GUI Workflow Steps" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#2C3E50;" vertex="1" parent="1">
+      <mxGeometry x="300" y="600" width="1000" height="24" as="geometry" />
+    </mxCell>
+
+    <mxCell id="step1" value="&lt;b&gt;① Equilibration&lt;/b&gt;&lt;br&gt;equ_site.namd&lt;br&gt;equ_solv.namd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDEDEC;strokeColor=#E74C3C;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="300" y="632" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="step2" value="&lt;b&gt;② REMD FEP Run&lt;/b&gt;&lt;br&gt;namd3 +replicas N&lt;br&gt;FEP_remd_softcore.namd" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF9E7;strokeColor=#D35400;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="560" y="632" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="step3" value="&lt;b&gt;③ Sort Replicas&lt;/b&gt;&lt;br&gt;sort_replicas.py&lt;br&gt;(un-shuffle λ trajectories)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EAFAF1;strokeColor=#1E8449;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="820" y="632" width="200" height="80" as="geometry" />
+    </mxCell>
+
+    <mxCell id="step4" value="&lt;b&gt;④ BAR Analysis&lt;/b&gt;&lt;br&gt;calc_bar_fe.py&lt;br&gt;ΔG_site, ΔG_solv → ΔG_bind" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5EEF8;strokeColor=#7D3C98;fontColor=#1A252F;fontSize=11;arcSize=15;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="1080" y="632" width="220" height="80" as="geometry" />
+    </mxCell>
+
+    <!-- Arrows between workflow steps -->
     <mxCell id="s12" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endArrow=block;endFill=1;strokeColor=#717D7E;strokeWidth=2;" edge="1" source="step1" target="step2" parent="1">
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
@@ -215,19 +187,12 @@
       <mxGeometry relative="1" as="geometry" />
     </mxCell>
 
-    <!-- Dashed connectors: alchemical legs → Step 2 -->
-    <mxCell id="dc1" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.2;entryY=0;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;strokeColor=#BDC3C7;strokeWidth=1.5;" edge="1" source="leg1_l0" target="step2" parent="1">
-      <mxGeometry relative="1" as="geometry" />
-    </mxCell>
-    <mxCell id="dc2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;dashed=1;endArrow=open;endFill=0;strokeColor=#BDC3C7;strokeWidth=1.5;" edge="1" source="leg2_l0" target="step2" parent="1">
-      <mxGeometry relative="1" as="geometry" />
-    </mxCell>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- FINAL EQUATION BOX                                      -->
+    <!-- ═══════════════════════════════════════════════════════ -->
 
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- REFERENCES FOOTER -->
-    <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <mxCell id="refs" value="[1] Kim et al. (2020) J. Chem. Theory Comput. 16, 7207–7218 (CHARMM-GUI Free Energy Calculator)  |  [2] Jo et al. (2013) J. Chem. Inf. Model. 53, 267–277 (CHARMM-GUI Ligand Binder)  |  [3] Phillips et al. (2020) J. Chem. Phys. 153, 044130 (NAMD 3)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontStyle=2;fontColor=#7F8C8D;" vertex="1" parent="1">
-      <mxGeometry x="20" y="700" width="1560" height="24" as="geometry" />
+    <mxCell id="eqBox" value="&lt;b&gt;Final Equation:&lt;/b&gt;&lt;br&gt;ΔG_bind = ΔG_site − ΔG_solv + ΔG_restr_on + ΔG_restr_analytical&lt;br&gt;&lt;br&gt;where:  ΔG_site = ΔG_site_elec + ΔG_site_vdw  |  ΔG_solv = ΔG_solv_elec + ΔG_solv_vdw&lt;br&gt;ΔG_restr_on = numerical (from simulation)  |  ΔG_restr_analytical = Boresch correction (analytical, from force constants)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#555555;fontColor=#1A252F;fontSize=12;fontStyle=0;arcSize=8;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="300" y="740" width="1000" height="110" as="geometry" />
     </mxCell>
 
   </root>

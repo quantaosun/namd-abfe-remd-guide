@@ -128,7 +128,7 @@ python3 scripts/namd_cpu_advisor.py --lscpu-file lscpu.txt # from saved file
 |:-----------:|:----:|:----------:|:---|
 | 7 | 14 | 2 | **Best** — each replica runs 2-threaded (faster MD) |
 | 14 | 14 | 1 | Good — more lambda coverage, but single-threaded per replica |
-| 2 | 14 | 7 | Not recommended — too few lambda windows |
+| 2 | 14 | 7 | Not recommended — too few replicas to efficiently traverse lambda space |
 
 ---
 
@@ -144,10 +144,11 @@ When reducing from 32 to `N` replicas, update these 5 files in both `complex/` a
 | `sort.py` | `num_replica = N` (also fix Python 2 `print` → Python 3) |
 | `calc_fe.pl` | `$fep_win_num = N` |
 
-Use the helper script for a one-shot setup:
+Alternatively, use the provided helper script which automatically creates the directories, generates a scaled configuration file on the fly, and launches the REMD job:
 
 ```bash
-bash scripts/run_abfe_remd.sh --replicas 7 --cpus 14 --system complex
+# Usage: bash run_abfe_remd.sh <leg> <nreplicas> <ncpus> <num_runs> <steps_per_run>
+bash scripts/run_abfe_remd.sh site 7 14 1000 1000
 ```
 
 ---

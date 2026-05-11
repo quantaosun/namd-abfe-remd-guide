@@ -1,265 +1,209 @@
 #!/usr/bin/env python3
 """
-Generate a clean ABFE thermodynamic cycle diagram using matplotlib.
-- No overlapping text or arrows
-- No references inside the image
-- Correct full equation with restraint correction terms
-Output: docs/abfe_thermodynamic_cycle.png
+Generate two clean black-and-white ABFE diagrams:
+  1. docs/abfe_thermodynamic_cycle.png  — the thermodynamic cycle
+  2. docs/abfe_restraint_correction.png — the restraint correction scheme
 """
 
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch
-import numpy as np
 import os
 
-# ── Colour palette ────────────────────────────────────────────────────────────
-C_PHYS    = '#D6EAF8'
-C_BLUE    = '#2980B9'
-C_SITE    = '#EBF5FB'
-C_SOLV    = '#EAFAF1'
-C_GREEN   = '#1E8449'
-C_ORANGE  = '#D35400'
-C_ORANGE_L= '#FEF9E7'
-C_PURPLE  = '#7D3C98'
-C_PURPLE_L= '#F5EEF8'
-C_GREY    = '#717D7E'
-C_GREY_L  = '#F2F3F4'
-C_DARK    = '#1A252F'
-C_RED     = '#C0392B'
+DOCS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs')
 
-def rbox(ax, cx, cy, w, h, fc, ec, lw=1.8):
-    """Draw a rounded box centred at (cx, cy)."""
+# ── shared helpers ────────────────────────────────────────────────────────────
+def rbox(ax, cx, cy, w, h, lw=1.5, fill='white', ec='black'):
     b = FancyBboxPatch((cx - w/2, cy - h/2), w, h,
-                       boxstyle="round,pad=0.12", linewidth=lw,
-                       edgecolor=ec, facecolor=fc, zorder=3)
+                       boxstyle="round,pad=0.10", linewidth=lw,
+                       edgecolor=ec, facecolor=fill, zorder=3)
     ax.add_patch(b)
 
-def txt(ax, x, y, s, fs=9, bold=False, color=C_DARK, ha='center', va='center',
-        italic=False):
-    kw = dict(ha=ha, va=va, fontsize=fs, color=color, zorder=5)
+def txt(ax, x, y, s, fs=9, bold=False, ha='center', va='center', italic=False):
+    kw = dict(ha=ha, va=va, fontsize=fs, color='black', zorder=5)
     if bold:   kw['fontweight'] = 'bold'
     if italic: kw['fontstyle']  = 'italic'
     ax.text(x, y, s, **kw)
 
-def harrow(ax, x0, x1, y, color=C_DARK, lw=2.0, dashed=False):
+def harrow(ax, x0, x1, y, lw=1.5, dashed=False):
     ls = 'dashed' if dashed else 'solid'
     ax.annotate('', xy=(x1, y), xytext=(x0, y),
-                arrowprops=dict(arrowstyle='->', color=color, lw=lw,
+                arrowprops=dict(arrowstyle='->', color='black', lw=lw,
                                 linestyle=ls), zorder=4)
 
-def varrow(ax, x, y0, y1, color=C_GREY, lw=1.4, dashed=True):
+def varrow(ax, x, y0, y1, lw=1.2, dashed=True):
     ls = 'dashed' if dashed else 'solid'
     ax.annotate('', xy=(x, y1), xytext=(x, y0),
-                arrowprops=dict(arrowstyle='->', color=color, lw=lw,
+                arrowprops=dict(arrowstyle='->', color='black', lw=lw,
                                 linestyle=ls), zorder=4)
 
-# ── Figure ────────────────────────────────────────────────────────────────────
-fig, ax = plt.subplots(figsize=(18, 14))
-ax.set_xlim(0, 18)
-ax.set_ylim(0, 14)
+# ══════════════════════════════════════════════════════════════════════════════
+# DIAGRAM 1 — Thermodynamic Cycle
+# ══════════════════════════════════════════════════════════════════════════════
+fig, ax = plt.subplots(figsize=(14, 9))
+ax.set_xlim(0, 14); ax.set_ylim(0, 9)
 ax.axis('off')
 fig.patch.set_facecolor('white')
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# TITLE
-# ═══════════════════════════════════════════════════════════════════════════════
-txt(ax, 9, 13.5,
-    'Absolute Binding Free Energy (ABFE) — Alchemical Thermodynamic Cycle',
-    fs=15, bold=True)
+# Title
+txt(ax, 7, 8.65,
+    'ABFE Alchemical Thermodynamic Cycle',
+    fs=13, bold=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# ROW 1 — Physical states  (y ≈ 12)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y1 = 12.0
-BW, BH = 4.0, 1.2
+# ── Row 1: physical states ────────────────────────────────────────────────────
+Y1 = 7.2
+rbox(ax, 2.8, Y1, 4.2, 1.1, lw=2)
+txt(ax, 2.8, Y1 + 0.28, 'Protein · Ligand  [P·L]', fs=10, bold=True)
+txt(ax, 2.8, Y1 - 0.05, 'Ligand bound in protein pocket', fs=9)
+txt(ax, 2.8, Y1 - 0.33, '(fully interacting,  λ = 0)', fs=8.5, italic=True)
 
-# State A: bound complex
-rbox(ax, 3.5, Y1, BW, BH, C_PHYS, C_BLUE, lw=2)
-txt(ax, 3.5, Y1 + 0.28, 'Protein · Ligand  [P·L]', fs=10, bold=True, color=C_BLUE)
-txt(ax, 3.5, Y1 - 0.10, 'Ligand bound in protein pocket', fs=9)
-txt(ax, 3.5, Y1 - 0.38, '(fully interacting,  λ = 0)', fs=8.5, color=C_GREY)
-
-# State B: unbound
-rbox(ax, 14.5, Y1, BW, BH, C_PHYS, C_BLUE, lw=2)
-txt(ax, 14.5, Y1 + 0.28, 'Protein  +  Ligand  [P + L]', fs=10, bold=True, color=C_BLUE)
-txt(ax, 14.5, Y1 - 0.10, 'Ligand free in solution', fs=9)
-txt(ax, 14.5, Y1 - 0.38, '(fully interacting,  λ = 0)', fs=8.5, color=C_GREY)
+rbox(ax, 11.2, Y1, 4.2, 1.1, lw=2)
+txt(ax, 11.2, Y1 + 0.28, 'Protein  +  Ligand  [P + L]', fs=10, bold=True)
+txt(ax, 11.2, Y1 - 0.05, 'Ligand free in solution', fs=9)
+txt(ax, 11.2, Y1 - 0.33, '(fully interacting,  λ = 0)', fs=8.5, italic=True)
 
 # ΔG_bind dashed arrow
-harrow(ax, 5.5, 12.5, Y1, C_PURPLE, lw=2.5, dashed=True)
-txt(ax, 9.0, Y1 + 0.38, 'ΔG_bind  (target — not directly simulated)',
-    fs=9, italic=True, color=C_PURPLE)
+harrow(ax, 4.9, 9.1, Y1, lw=2, dashed=True)
+txt(ax, 7.0, Y1 + 0.38,
+    'ΔG_bind  (target — not directly simulated)',
+    fs=8.5, italic=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# ROW 2 — Alchemical legs  (y ≈ 9.5)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y2 = 9.5
-LBW, LBH = 3.2, 1.3   # lambda endpoint box size
+# ── Row 2: alchemical legs ────────────────────────────────────────────────────
+Y2 = 4.6
+LW, LH = 2.8, 1.1
 
-# ─── LEG 1: Complex (site) ───────────────────────────────────────────────────
-# Header band
-rbox(ax, 4.0, Y2 + 1.25, 6.8, 0.45, C_SITE, C_BLUE, lw=1.5)
-txt(ax, 4.0, Y2 + 1.25, 'LEG 1 — Complex (Site)', fs=10, bold=True, color=C_BLUE)
+# LEG 1 header
+rbox(ax, 3.5, Y2 + 1.15, 5.8, 0.38, lw=1.2, fill='#f0f0f0')
+txt(ax, 3.5, Y2 + 1.15, 'LEG 1 — Complex (Site)', fs=9.5, bold=True)
 
-# λ=0 box
-rbox(ax, 1.8, Y2, LBW, LBH, C_SITE, C_BLUE, lw=1.5)
-txt(ax, 1.8, Y2 + 0.30, '[P·L]  λ = 0', fs=9.5, bold=True, color=C_BLUE)
-txt(ax, 1.8, Y2 + 0.00, 'Ligand fully coupled', fs=8.5)
-txt(ax, 1.8, Y2 - 0.28, 'in protein pocket', fs=8.5)
+rbox(ax, 1.6, Y2, LW, LH, lw=1.5)
+txt(ax, 1.6, Y2 + 0.25, '[P·L]  λ = 0', fs=9, bold=True)
+txt(ax, 1.6, Y2 - 0.05, 'Ligand fully coupled', fs=8.5)
+txt(ax, 1.6, Y2 - 0.30, 'in protein pocket', fs=8.5)
 
-# λ=1 box
-rbox(ax, 6.2, Y2, LBW, LBH, C_GREY_L, C_GREY, lw=1.5)
-txt(ax, 6.2, Y2 + 0.30, '[P·L*]  λ = 1', fs=9.5, bold=True, color=C_GREY)
-txt(ax, 6.2, Y2 + 0.00, 'Ligand decoupled', fs=8.5, color=C_GREY)
-txt(ax, 6.2, Y2 - 0.28, '(ghost in pocket)', fs=8.5, color=C_GREY)
+rbox(ax, 5.4, Y2, LW, LH, lw=1.5, fill='#f8f8f8', ec='#888888')
+txt(ax, 5.4, Y2 + 0.25, '[P·L*]  λ = 1', fs=9, bold=True)
+txt(ax, 5.4, Y2 - 0.05, 'Ligand decoupled', fs=8.5)
+txt(ax, 5.4, Y2 - 0.30, '(ghost in pocket)', fs=8.5)
 
-# Arrow with label ABOVE
-harrow(ax, 3.4, 4.6, Y2, C_BLUE, lw=2.5)
-txt(ax, 4.0, Y2 + 0.60, '−ΔG_site_elec  −  ΔG_site_vdW  −  ΔG_restr_on',
-    fs=8.5, bold=True, color=C_BLUE)
+harrow(ax, 3.0, 4.0, Y2, lw=2)
+txt(ax, 3.5, Y2 + 0.55,
+    '−ΔG_site_elec  −  ΔG_site_vdW  −  ΔG_restr_on',
+    fs=8, bold=True)
 
-# ─── LEG 2: Solvation (solv) ─────────────────────────────────────────────────
-# Header band
-rbox(ax, 13.8, Y2 + 1.25, 6.8, 0.45, C_SOLV, C_GREEN, lw=1.5)
-txt(ax, 13.8, Y2 + 1.25, 'LEG 2 — Solvation (Solv)', fs=10, bold=True, color=C_GREEN)
+# LEG 2 header
+rbox(ax, 10.5, Y2 + 1.15, 5.8, 0.38, lw=1.2, fill='#f0f0f0')
+txt(ax, 10.5, Y2 + 1.15, 'LEG 2 — Solvation (Solv)', fs=9.5, bold=True)
 
-# λ=0 box
-rbox(ax, 11.2, Y2, LBW, LBH, C_SOLV, C_GREEN, lw=1.5)
-txt(ax, 11.2, Y2 + 0.30, '[L]  λ = 0', fs=9.5, bold=True, color=C_GREEN)
-txt(ax, 11.2, Y2 + 0.00, 'Ligand fully coupled', fs=8.5)
-txt(ax, 11.2, Y2 - 0.28, 'in water', fs=8.5)
+rbox(ax, 8.6, Y2, LW, LH, lw=1.5)
+txt(ax, 8.6, Y2 + 0.25, '[L]  λ = 0', fs=9, bold=True)
+txt(ax, 8.6, Y2 - 0.05, 'Ligand fully coupled', fs=8.5)
+txt(ax, 8.6, Y2 - 0.30, 'in water', fs=8.5)
 
-# λ=1 box
-rbox(ax, 16.4, Y2, LBW, LBH, C_GREY_L, C_GREY, lw=1.5)
-txt(ax, 16.4, Y2 + 0.30, '[L*]  λ = 1', fs=9.5, bold=True, color=C_GREY)
-txt(ax, 16.4, Y2 + 0.00, 'Ligand decoupled', fs=8.5, color=C_GREY)
-txt(ax, 16.4, Y2 - 0.28, '(ghost in water)', fs=8.5, color=C_GREY)
+rbox(ax, 12.4, Y2, LW, LH, lw=1.5, fill='#f8f8f8', ec='#888888')
+txt(ax, 12.4, Y2 + 0.25, '[L*]  λ = 1', fs=9, bold=True)
+txt(ax, 12.4, Y2 - 0.05, 'Ligand decoupled', fs=8.5)
+txt(ax, 12.4, Y2 - 0.30, '(ghost in water)', fs=8.5)
 
-# Arrow with label ABOVE
-harrow(ax, 12.8, 14.8, Y2, C_GREEN, lw=2.5)
-txt(ax, 13.8, Y2 + 0.60, '−ΔG_solv_elec  −  ΔG_solv_vdW',
-    fs=8.5, bold=True, color=C_GREEN)
+harrow(ax, 10.0, 11.0, Y2, lw=2)
+txt(ax, 10.5, Y2 + 0.55,
+    '−ΔG_solv_elec  −  ΔG_solv_vdW',
+    fs=8, bold=True)
 
-# Vertical connectors: physical states → leg headers (well-separated)
-varrow(ax, 3.5, Y1 - 0.60, Y2 + 1.48, C_GREY, lw=1.4, dashed=True)
-varrow(ax, 14.5, Y1 - 0.60, Y2 + 1.48, C_GREY, lw=1.4, dashed=True)
+# Vertical connectors: physical → leg headers
+varrow(ax, 2.8, Y1 - 0.56, Y2 + 1.34, lw=1.2, dashed=True)
+varrow(ax, 11.2, Y1 - 0.56, Y2 + 1.34, lw=1.2, dashed=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# ROW 3 — Lambda window strip  (y ≈ 7.5)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y3 = 7.5
-txt(ax, 9.0, Y3 + 0.85,
-    'λ-Windows: REMD exchanges configurations between adjacent windows at each step',
-    fs=9, italic=True, color=C_DARK)
-
-n = 9
-lambdas  = np.linspace(0, 1, n)
-lcolors  = plt.cm.RdYlGn(lambdas)
-bw_lam   = 1.55   # box width
-gap_lam  = 0.15   # gap between boxes
-total_w  = n * bw_lam + (n - 1) * gap_lam
-x0_lam   = (18 - total_w) / 2
-
-for i, (lam, col) in enumerate(zip(lambdas, lcolors)):
-    bx = x0_lam + i * (bw_lam + gap_lam)
-    b = FancyBboxPatch((bx, Y3), bw_lam, 0.65,
-                       boxstyle="round,pad=0.06", linewidth=1.2,
-                       edgecolor='#888', facecolor=col, alpha=0.90, zorder=3)
-    ax.add_patch(b)
-    tc = 'white' if lam < 0.35 or lam > 0.75 else C_DARK
-    ax.text(bx + bw_lam/2, Y3 + 0.325,
-            f'λ={lam:.2f}', ha='center', va='center',
-            fontsize=8.5, fontweight='bold', color=tc, zorder=5)
-    # ⇌ symbol in the gap (not overlapping boxes)
-    if i < n - 1:
-        sx = bx + bw_lam + gap_lam / 2
-        ax.text(sx, Y3 + 0.325, '⇌', ha='center', va='center',
-                fontsize=12, color='#888888', zorder=5)
-
-txt(ax, x0_lam + bw_lam/2, Y3 - 0.22, 'fully coupled', fs=8, color=C_RED)
-txt(ax, x0_lam + (n-1)*(bw_lam+gap_lam) + bw_lam/2, Y3 - 0.22,
-    'fully decoupled', fs=8, color=C_GREY)
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ROW 4 — Restraint correction box  (y ≈ 5.2)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y4 = 5.2
-rbox(ax, 9.0, Y4, 16.4, 1.6, C_ORANGE_L, C_ORANGE, lw=2)
-txt(ax, 9.0, Y4 + 0.62,
-    'Restraint Correction  —  Required to remove artefact energy introduced during decoupling',
-    fs=10, bold=True, color=C_ORANGE)
-txt(ax, 9.0, Y4 + 0.22,
-    '① ΔG_restr_on :  free energy cost of applying DBC restraints while ligand is still interacting  '
-    '(computed numerically from restraint λ-windows)',
-    fs=9, color=C_DARK)
-txt(ax, 9.0, Y4 - 0.18,
-    '② ΔG_restr_analytical :  Boresch standard-state correction — releases restrained ghost ligand to 1 M standard concentration',
-    fs=9, color=C_DARK)
-txt(ax, 9.0, Y4 - 0.52,
-    '(computed analytically from restraint force constants and equilibrium values — no additional simulation needed)',
-    fs=8.5, italic=True, color=C_GREY)
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# EQUATION BOX  (y ≈ 3.7)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y_EQ = 3.7
-rbox(ax, 9.0, Y_EQ, 16.8, 0.75, C_PURPLE_L, C_PURPLE, lw=2.5)
-txt(ax, 9.0, Y_EQ,
+# ── Row 3: equation ───────────────────────────────────────────────────────────
+Y3 = 2.7
+rbox(ax, 7.0, Y3, 13.0, 0.70, lw=2)
+txt(ax, 7.0, Y3,
     'ΔG_bind  =  ΔG_site  −  ΔG_solv  +  ΔG_restr_on  +  ΔG_restr_analytical',
-    fs=12, bold=True, color=C_PURPLE)
+    fs=11, bold=True)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# ROW 5 — NAMD workflow steps  (y ≈ 1.8)
-# ═══════════════════════════════════════════════════════════════════════════════
-Y5 = 1.8
-SW, SH = 3.6, 1.8
-step_data = [
-    (2.3,  'Step 1\nEquilibration',
-     'equ_site.namd\nequ_solv.namd',
-     '#FDEDEC', C_RED),
-    (6.4,  'Step 2\nREMD FEP Run',
-     'namd3 +replicas N\nFEP_remd_softcore.namd',
-     C_ORANGE_L, C_ORANGE),
-    (10.5, 'Step 3\nSort Replicas',
-     'sort_replicas.py\n(un-shuffle λ trajectories)',
-     C_SOLV, C_GREEN),
-    (14.6, 'Step 4\nBAR Analysis',
-     'calc_bar_fe.py\nΔG_site, ΔG_solv → ΔG_bind',
-     C_PURPLE_L, C_PURPLE),
+# ── Row 4: NAMD workflow steps ────────────────────────────────────────────────
+Y4 = 1.2
+SW, SH = 2.6, 1.4
+steps = [
+    (1.6,  'Step 1',       'Equilibration',        'equ_site / equ_solv'),
+    (4.7,  'Step 2',       'REMD FEP Run',          'namd3 +replicas N'),
+    (7.8,  'Step 3',       'Sort Replicas',         'sort_replicas.py'),
+    (10.9, 'Step 4',       'BAR Analysis',          'calc_bar_fe.py'),
 ]
+for cx, s1, s2, s3 in steps:
+    rbox(ax, cx, Y4, SW, SH, lw=1.5)
+    txt(ax, cx, Y4 + 0.42, s1, fs=8.5, bold=True)
+    txt(ax, cx, Y4 + 0.12, s2, fs=9,   bold=True)
+    txt(ax, cx, Y4 - 0.22, s3, fs=8,   italic=True)
 
-for cx, title, body, fc, ec in step_data:
-    rbox(ax, cx, Y5, SW, SH, fc, ec, lw=1.8)
-    lines = title.split('\n')
-    txt(ax, cx, Y5 + 0.52, lines[0], fs=10, bold=True, color=ec)
-    txt(ax, cx, Y5 + 0.18, lines[1], fs=10, bold=True, color=ec)
-    for j, line in enumerate(body.split('\n')):
-        txt(ax, cx, Y5 - 0.22 - j * 0.30, line, fs=8.5, color=C_DARK)
+for x0, x1 in [(2.9, 3.4), (6.0, 6.5), (9.1, 9.6)]:
+    harrow(ax, x0, x1, Y4, lw=1.5)
 
-# Arrows between steps (in the gap between boxes, not overlapping)
-for x0, x1 in [(4.1, 4.6), (8.2, 8.7), (12.3, 12.8)]:
-    harrow(ax, x0, x1, Y5, C_GREY, lw=2.0)
-
-# ── Legend ────────────────────────────────────────────────────────────────────
-legend_items = [
-    mpatches.Patch(facecolor=C_PHYS,   edgecolor=C_BLUE,   label='Physical state (real)'),
-    mpatches.Patch(facecolor=C_SITE,   edgecolor=C_BLUE,   label='Complex leg (site)'),
-    mpatches.Patch(facecolor=C_SOLV,   edgecolor=C_GREEN,  label='Solvation leg (solv)'),
-    mpatches.Patch(facecolor=C_GREY_L, edgecolor=C_GREY,   label='Decoupled state (λ=1)'),
-    mpatches.Patch(facecolor=C_ORANGE_L,edgecolor=C_ORANGE,label='Restraint correction'),
-    mpatches.Patch(facecolor=C_PURPLE_L,edgecolor=C_PURPLE,label='Final equation / BAR'),
-]
-ax.legend(handles=legend_items, loc='lower right', fontsize=9,
-          framealpha=0.95, edgecolor='#BDC3C7',
-          bbox_to_anchor=(0.998, 0.002))
-
-# ── Save ──────────────────────────────────────────────────────────────────────
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                   '..', 'docs', 'abfe_thermodynamic_cycle.png')
 plt.tight_layout(pad=0.3)
-plt.savefig(out, dpi=180, bbox_inches='tight', facecolor='white')
+out1 = os.path.join(DOCS, 'abfe_thermodynamic_cycle.png')
+plt.savefig(out1, dpi=180, bbox_inches='tight', facecolor='white')
 plt.close()
-print(f"Saved: {os.path.abspath(out)}")
+print(f"Saved: {out1}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DIAGRAM 2 — Restraint Correction
+# ══════════════════════════════════════════════════════════════════════════════
+fig2, ax2 = plt.subplots(figsize=(12, 6))
+ax2.set_xlim(0, 12); ax2.set_ylim(0, 6)
+ax2.axis('off')
+fig2.patch.set_facecolor('white')
+
+txt(ax2, 6, 5.65,
+    'ABFE Restraint Correction — Why It Is Needed',
+    fs=13, bold=True)
+
+# Problem statement box
+rbox(ax2, 6, 4.85, 11.0, 0.65, lw=1.5, fill='#f0f0f0')
+txt(ax2, 6, 4.95,
+    'Problem: During decoupling, DBC restraints hold the ghost ligand in place.',
+    fs=9.5)
+txt(ax2, 6, 4.70,
+    'These restraints introduce artificial free energy that must be removed.',
+    fs=9.5, italic=True)
+
+# Term 1
+rbox(ax2, 3.0, 3.4, 5.2, 1.1, lw=1.5)
+txt(ax2, 3.0, 3.75, '① ΔG_restr_on', fs=10, bold=True)
+txt(ax2, 3.0, 3.45, 'Cost of switching ON restraints', fs=9)
+txt(ax2, 3.0, 3.18, 'while ligand is still interacting', fs=9)
+txt(ax2, 3.0, 2.92, '→ computed numerically from simulation', fs=8.5, italic=True)
+
+# Term 2
+rbox(ax2, 9.0, 3.4, 5.2, 1.1, lw=1.5)
+txt(ax2, 9.0, 3.75, '② ΔG_restr_analytical', fs=10, bold=True)
+txt(ax2, 9.0, 3.45, 'Boresch standard-state correction:', fs=9)
+txt(ax2, 9.0, 3.18, 'releases ghost ligand to 1 M standard state', fs=9)
+txt(ax2, 9.0, 2.92, '→ computed analytically, no extra simulation', fs=8.5, italic=True)
+
+# Plus sign between
+txt(ax2, 6.0, 3.4, '+', fs=18, bold=True)
+
+# Correction equation
+rbox(ax2, 6, 2.1, 10.0, 0.65, lw=2)
+txt(ax2, 6, 2.1,
+    'Total correction  =  ΔG_restr_on  +  ΔG_restr_analytical',
+    fs=10, bold=True)
+
+# Full equation
+rbox(ax2, 6, 1.1, 11.2, 0.65, lw=2)
+txt(ax2, 6, 1.1,
+    'ΔG_bind  =  ΔG_site  −  ΔG_solv  +  ΔG_restr_on  +  ΔG_restr_analytical',
+    fs=10, bold=True)
+
+# Footnote
+txt(ax2, 6, 0.35,
+    'Boresch et al. (2003) J. Phys. Chem. B 107, 9535–9551',
+    fs=8, italic=True)
+
+plt.tight_layout(pad=0.3)
+out2 = os.path.join(DOCS, 'abfe_restraint_correction.png')
+plt.savefig(out2, dpi=180, bbox_inches='tight', facecolor='white')
+plt.close()
+print(f"Saved: {out2}")

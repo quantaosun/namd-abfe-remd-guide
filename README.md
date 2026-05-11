@@ -11,7 +11,7 @@ The [CHARMM-GUI Free Energy Calculator](https://www.charmm-gui.org/input/fec) [1
 
 This repository solves both issues. It documents the full compilation process (including all errors encountered and their fixes), and provides tools to automatically scale the CHARMM-GUI scripts to match your available CPU count.
 
-> **Important:** Reducing the number of simultaneously active replicas does **not** change the lambda window values themselves — all 32 lambda states are still sampled. However, fewer replicas means longer round-trip times across lambda space, which slows convergence. To compensate, you should run more MD steps per replica. See [Accuracy and Speed Trade-offs](#accuracy-and-speed-trade-offs) below.
+> **Important:** Reducing the number of simultaneously active replicas does **not** change the lambda window values themselves — all 32 lambda states are still sampled. However, fewer replicas means longer round-trip times across lambda space, which slows convergence. The default step count in the CHARMM-GUI scripts is generally sufficient, but be aware that running fewer replicas may result in a slight decrease in statistical accuracy compared to a full 32-replica run. See [Accuracy and Speed Trade-offs](#accuracy-and-speed-trade-offs) below.
 
 ---
 
@@ -43,7 +43,11 @@ The Boresch analytical correction [2] accounts for the fact that the restrained 
 
 ![ABFE Thermodynamic Cycle](docs/abfe_thermodynamic_cycle.png)
 
-**Figure:** ABFE thermodynamic cycle. The dashed top arrow (ΔG_bind) is the target quantity and is not simulated directly. The two solid vertical/horizontal arrows represent the alchemical legs simulated by NAMD. Lambda windows (λ = 0 → 1) are run simultaneously as replicas with REMD exchanges between adjacent windows.
+**Figure 1:** ABFE thermodynamic cycle. The dashed top arrow (ΔG_bind) is the target quantity and is not simulated directly. The two solid vertical/horizontal arrows represent the alchemical legs simulated by NAMD.
+
+![ABFE Restraint Correction](docs/abfe_restraint_correction.png)
+
+**Figure 2:** Restraint correction scheme. The artificial free energy introduced by the DBC restraints during decoupling must be explicitly removed using both numerical and analytical terms.
 
 **References for the diagram:**
 - [1] Kim et al. (2020) *J. Chem. Theory Comput.* 16, 7207–7218 — CHARMM-GUI Free Energy Calculator
@@ -180,7 +184,7 @@ python3 scripts/calc_bar_fe.py   --leg site --replicas 7
 Reducing the number of simultaneously active replicas (e.g., from 32 to 7) does **not** reduce the theoretical accuracy of the final ΔG_bind value, because all 32 lambda windows are still sampled. However:
 
 - **Convergence is slower.** With fewer replicas, a configuration takes longer to traverse the full λ = 0 → 1 path via REMD exchanges, making it harder to escape kinetic traps (e.g., trapped water molecules or sidechain rotamers near the binding site).
-- **Compensation:** Run more MD steps per replica to achieve the same statistical convergence as a 32-replica run.
+- **Compensation:** While the default step count in the CHARMM-GUI scripts is usually fine, achieving the exact same statistical convergence (error bar) as a 32-replica run would technically require running more MD steps per replica.
 
 For a detailed discussion with literature references, see [docs/02_replica_scaling_guide.md](docs/02_replica_scaling_guide.md).
 

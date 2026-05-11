@@ -148,7 +148,8 @@ Alternatively, use the provided helper script which automatically creates the di
 
 ```bash
 # Usage: bash run_abfe_remd.sh <leg> <nreplicas> <ncpus> <num_runs> <steps_per_run>
-bash scripts/run_abfe_remd.sh site 7 14 1000 1000
+# Default CHARMM-GUI values: num_runs=1000, steps_per_run=100 (100,000 total steps per replica)
+bash scripts/run_abfe_remd.sh site 7 14 1000 100
 ```
 
 ---

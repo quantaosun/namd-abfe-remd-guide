@@ -2,6 +2,13 @@
 
 This repository provides a comprehensive guide for compiling NAMD 3.0.2 from source to support Replica Exchange Molecular Dynamics (REMD) and adapting CHARMM-GUI Absolute Binding Free Energy (ABFE) scripts to run on systems with limited CPU resources.
 
+### Motivation
+The CHARMM-GUI Free Energy Calculator [1] provides an excellent, automated pipeline for generating ABFE inputs. However, running these calculations in practice presents two major hurdles for many researchers:
+1. **Hardware Constraints:** The default CHARMM-GUI ABFE configuration requires 32 CPUs (one for each $\lambda$ window). Many users do not have access to 32-core workstations or large HPC clusters.
+2. **Compilation Complexity:** The standard NAMD binaries do not support the required replica exchange features. Compiling NAMD from source with the correct Charm++ backend (`netlrts`) is complex, error-prone, and often beyond the comfort zone of non-coding audiences.
+
+This repository solves both issues by providing a step-by-step guide to successfully compiling NAMD with replica exchange support, and a set of tools to automatically scale down the CHARMM-GUI scripts to run on fewer CPUs (e.g., 4, 8, or 14 cores) without breaking the simulation.
+
 ## Table of Contents
 1. [Background: What is ABFE?](#1-background-what-is-abfe)
 2. [Compiling NAMD 3.0.2 for Replica Exchange](#2-compiling-namd-302-for-replica-exchange)
@@ -219,18 +226,23 @@ Launch the REMD simulation using `charmrun ++local` (which runs the network back
 ## 6. Analysis and Free Energy Calculation
 
 After the REMD simulation completes, run the analysis scripts to calculate the Bennett Acceptance Ratio (BAR) free energy.
-
 1. **Sort the trajectories by lambda window:**
    ```bash
    perl 4_sort.pl
    ```
-   This runs `sort.py` to unshuffle the replica histories into the `output_off/` directories.
+   *(Or use the `sort_replicas.py` script provided in this repo if you changed the replica count).*
 
-2. **Calculate Free Energy:**
+2. **Calculate the free energy:**
    ```bash
    perl 5_fe.pl
    ```
-   This runs `calc_fe.pl` across all runs and averages the ΔG values.
+   *(Or use the `calc_bar_fe.py` script provided in this repo).*
+
+---
+
+## References
+
+[1] Kim, S., Oshima, H., Zhang, H., Kern, N. R., Re, S., Lee, J., Roux, B., Sugita, Y., Jiang, W., & Im, W. (2020). CHARMM-GUI Free Energy Calculator for Absolute and Relative Ligand Solvation and Binding Free Energy Simulations. *Journal of Chemical Theory and Computation*, 16(11), 7207–7218. https://doi.org/10.1021/acs.jctc.0c00884
 
 Repeat the entire process for both the `complex` (site) and `ligand` (solvation) legs. The Absolute Binding Free Energy is:
 **ΔG_bind = ΔG_site - ΔG_solv**

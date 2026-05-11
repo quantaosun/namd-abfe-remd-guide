@@ -147,9 +147,10 @@ When reducing from 32 to `N` replicas, update these 5 files in both `complex/` a
 Alternatively, use the provided helper script which automatically creates the directories, generates a scaled configuration file on the fly, and launches the REMD job:
 
 ```bash
-# Usage: bash run_abfe_remd.sh <leg> <nreplicas> <ncpus> <num_runs> <steps_per_run>
-# Default CHARMM-GUI values: num_runs=1000, steps_per_run=100 (100,000 total steps per replica)
-bash scripts/run_abfe_remd.sh site 7 14 1000 100
+# Usage: bash run_abfe_remd.sh <leg> <nreplicas> <ncpus>
+# The script automatically reads all simulation parameters (steps, runs, etc.) 
+# directly from the CHARMM-GUI conf files so you don't have to modify them.
+bash scripts/run_abfe_remd.sh site 7 14
 ```
 
 ---

@@ -3,17 +3,37 @@
 This repository provides a comprehensive guide for compiling NAMD 3.0.2 from source to support Replica Exchange Molecular Dynamics (REMD) and adapting CHARMM-GUI Absolute Binding Free Energy (ABFE) scripts to run on systems with limited CPU resources.
 
 ## Table of Contents
-1. [Compiling NAMD 3.0.2 for Replica Exchange](#1-compiling-namd-302-for-replica-exchange)
-2. [CPU Advisor: How Many Replicas Should I Use?](#2-cpu-advisor-how-many-replicas-should-i-use)
-3. [Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs](#3-adapting-charmm-gui-abfe-scripts-for-fewer-cpus)
-4. [Running the ABFE Workflow](#4-running-the-abfe-workflow)
-5. [Analysis and Free Energy Calculation](#5-analysis-and-free-energy-calculation)
+1. [Background: What is ABFE?](#1-background-what-is-abfe)
+2. [Compiling NAMD 3.0.2 for Replica Exchange](#2-compiling-namd-302-for-replica-exchange)
+3. [CPU Advisor: How Many Replicas Should I Use?](#3-cpu-advisor-how-many-replicas-should-i-use)
+4. [Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs](#4-adapting-charmm-gui-abfe-scripts-for-fewer-cpus)
+5. [Running the ABFE Workflow](#5-running-the-abfe-workflow)
+6. [Analysis and Free Energy Calculation](#6-analysis-and-free-energy-calculation)
 
 ---
 
-## 1. Compiling NAMD 3.0.2 for Replica Exchange
+## 1. Background: What is ABFE?
 
-The standard `multicore` build of NAMD **does not support** partition-based replica exchange (`+replicas`). To run the CHARMM-GUI ABFE scripts, you must compile NAMD with a network-based Charm++ backend, such as `netlrts-linux-x86_64`.
+Absolute Binding Free Energy (ABFE) calculations use alchemical Free Energy Perturbation (FEP) to compute the binding affinity ($\Delta G_{bind}$) of a ligand to a protein. Because simulating the physical binding process directly is computationally intractable, ABFE uses a **thermodynamic cycle** to calculate the free energy difference between two non-physical ("alchemical") transformations:
+
+1. **Complex (site) leg:** The ligand is gradually decoupled (turned into a non-interacting "ghost") while bound in the protein pocket. This yields $-\Delta G_{site}$.
+2. **Solvation (solv) leg:** The ligand is gradually decoupled while free in water. This yields $-\Delta G_{solv}$.
+
+The binding free energy is then calculated as:
+**$\Delta G_{bind} = \Delta G_{site} - \Delta G_{solv}$**
+
+To ensure accurate sampling, the decoupling process is split into multiple discrete steps (lambda windows, typically 32). **Replica Exchange Molecular Dynamics (REMD)** is used to run all windows simultaneously and periodically swap configurations between adjacent windows, preventing the simulation from getting trapped in local energy minima.
+
+![ABFE Thermodynamic Cycle](docs/abfe_thermodynamic_cycle.png)
+
+---
+
+## 2. Compiling NAMD 3.0.2 for Replica Exchange
+
+### Why `netlrts`?
+The standard `multicore` build of NAMD **does not support** partition-based replica exchange (`+replicas`). According to the NAMD 3.0 User Guide and source documentation, multi-copy algorithms require a Charm++ build based on an "LRTS" (low-level run-time system) machine layer. 
+
+For a single multi-core workstation (SMP node), **`netlrts-linux-x86_64`** is the officially recommended and supported architecture for replica exchange. It uses `charmrun ++local` to launch multiple processes on the same machine without requiring SSH or MPI.
 
 ### Prerequisites (Ubuntu 22.04)
 Install the required build dependencies:
@@ -69,7 +89,7 @@ The resulting binary `namd3` and the Charm++ launcher `charmrun` (located in `ch
 
 ---
 
-## 2. CPU Advisor: How Many Replicas Should I Use?
+## 3. CPU Advisor: How Many Replicas Should I Use?
 
 `lscpu` reports **logical CPUs**, which includes hyperthreaded virtual cores. For MD simulations, only **physical cores** provide real floating-point throughput. Using hyperthreaded logical CPUs does not speed up NAMD and can slow it down due to cache contention.
 
@@ -125,7 +145,7 @@ The advisor ranks configurations by two criteria, in order:
 
 ---
 
-## 3. Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs
+## 4. Adapting CHARMM-GUI ABFE Scripts for Fewer CPUs
 
 The default CHARMM-GUI ABFE workflow uses **32 replicas** (lambda windows). NAMD's `+replicas N` flag requires that the total number of Processing Elements (PEs) is a multiple of N. If you have fewer than 32 CPUs (e.g., a 4-core or 8-core workstation), you cannot run 32 replicas efficiently.
 
@@ -175,7 +195,7 @@ $fep_win_num = 4;  # Change from 32
 
 ---
 
-## 3. Running the ABFE Workflow
+## 5. Running the ABFE Workflow
 
 With the scripts adapted, run the workflow using the `netlrts` NAMD build.
 
@@ -196,7 +216,7 @@ Launch the REMD simulation using `charmrun ++local` (which runs the network back
 
 ---
 
-## 4. Analysis and Free Energy Calculation
+## 6. Analysis and Free Energy Calculation
 
 After the REMD simulation completes, run the analysis scripts to calculate the Bennett Acceptance Ratio (BAR) free energy.
 

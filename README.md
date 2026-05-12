@@ -1,170 +1,84 @@
-# NAMD 3.0.2 ABFE Replica Exchange Guide
+# NAMD ABFE Replica Exchange Guide
 
-A practical guide for compiling NAMD 3.0.2 from source and running CHARMM-GUI generated Absolute Binding Free Energy (ABFE) simulations on workstations with limited CPU resources.
+This repository provides automated tools to run CHARMM-GUI Absolute Binding Free Energy (ABFE) calculations using NAMD on hardware with limited CPU cores.
 
-## Motivation
-
-The [CHARMM-GUI Free Energy Calculator](https://www.charmm-gui.org/input/fec) [1] provides an automated pipeline for generating ABFE inputs for NAMD. In practice, two barriers prevent many researchers from using it directly:
-
-1. **Hardware constraints.** The default CHARMM-GUI ABFE configuration requires 32 CPUs — one per lambda window. Most workstations have fewer cores.
-2. **Compilation complexity.** Pre-built NAMD binaries do not support replica exchange. Compiling NAMD from source with the correct Charm++ backend is non-trivial and error-prone, especially for non-coding users.
-
-This repository solves both issues. It documents the full compilation process (including all errors encountered and their fixes), and provides tools to automatically scale the CHARMM-GUI scripts to match your available CPU count.
-
-> **Important:** Reducing the number of simultaneously active replicas does **not** change the lambda window values themselves — all 32 lambda states are still sampled. However, fewer replicas means longer round-trip times across lambda space, which slows convergence. The default step count in the CHARMM-GUI scripts is generally sufficient, but be aware that running fewer replicas may result in a slight decrease in statistical accuracy compared to a full 32-replica run. See [Accuracy and Speed Trade-offs](#accuracy-and-speed-trade-offs) below.
+**Motivation:** The default CHARMM-GUI ABFE protocol requires 32 simultaneous replicas (meaning at least 32 physical CPU cores). If you have fewer cores, NAMD will fail to run. Additionally, compiling NAMD from source with the correct replica-exchange backend (`netlrts`) is complex and prone to errors on modern Linux systems. This repository solves both problems automatically.
 
 ---
 
-## Background: What is ABFE?
+## The 4-Step Workflow
 
-Absolute Binding Free Energy (ABFE) calculations use alchemical Free Energy Perturbation (FEP) to compute the binding affinity (ΔG_bind) of a ligand to a protein. Because directly simulating the physical binding event is computationally intractable, ABFE uses a **thermodynamic cycle** based on two non-physical ("alchemical") transformations:
-
-1. **Complex (site) leg:** The ligand is gradually decoupled (turned into a non-interacting ghost) while bound in the protein pocket → yields ΔG_site.
-2. **Solvation (solv) leg:** The ligand is gradually decoupled while free in water → yields ΔG_solv.
-
-### The Complete ABFE Equation
-
-A critical but often overlooked aspect is the **restraint correction**. During decoupling, harmonic restraints (DBC restraints in CHARMM-GUI, based on the Boresch scheme [2]) are applied to keep the ghost ligand in the binding pose. These restraints introduce an artificial free energy contribution that must be explicitly corrected:
-
-```
-ΔG_bind = ΔG_site − ΔG_solv + ΔG_restr_on + ΔG_restr_analytical
-```
-
-where:
-
-| Term | Description | How computed |
-|:---|:---|:---|
-| `ΔG_site` | Free energy of decoupling ligand from protein (elec + vdW) | Numerically, from REMD/BAR |
-| `ΔG_solv` | Free energy of decoupling ligand from water (elec + vdW) | Numerically, from REMD/BAR |
-| `ΔG_restr_on` | Free energy cost of **applying** DBC restraints while ligand is still interacting | Numerically, from simulation |
-| `ΔG_restr_analytical` | Boresch standard-state correction: releases the restrained ghost ligand to 1 M standard concentration | Analytically, from restraint force constants |
-
-The Boresch analytical correction [2] accounts for the fact that the restrained decoupled ligand does not correspond to the standard state concentration (1 M = 1/1660 Å³). It is computed from the equilibrium values and force constants of the six restraint terms (1 distance + 2 angles + 3 dihedrals) and requires no additional simulation.
-
-![ABFE Thermodynamic Cycle](docs/abfe_thermodynamic_cycle.png)
-
-**Figure 1:** ABFE thermodynamic cycle. The dashed top arrow (ΔG_bind) is the target quantity and is not simulated directly. The two solid vertical/horizontal arrows represent the alchemical legs simulated by NAMD.
-
-![ABFE Restraint Correction](docs/abfe_restraint_correction.png)
-
-**Figure 2:** Restraint correction scheme. The artificial free energy introduced by the DBC restraints during decoupling must be explicitly removed using both numerical and analytical terms.
-
-**References for the diagram:**
-- [1] Kim et al. (2020) *J. Chem. Theory Comput.* 16, 7207–7218 — CHARMM-GUI Free Energy Calculator
-- [2] Boresch et al. (2003) *J. Phys. Chem. B* 107, 9535–9551 — Restraint correction analytical formula
-
----
-
-## Compiling NAMD 3.0.2 for Replica Exchange
-
-### Why `netlrts`?
-
-The standard `multicore` NAMD build **does not support** partition-based replica exchange (`+replicas`). According to the NAMD source documentation, multi-copy algorithms require a Charm++ build using an LRTS (low-level run-time system) machine layer. For a single multi-core workstation, **`netlrts-linux-x86_64`** is the correct and officially supported choice. It uses `charmrun ++local` to launch multiple processes locally without SSH or MPI.
-
-### Prerequisites (Ubuntu 22.04)
-
-```bash
-sudo apt-get update
-sudo apt-get install -y build-essential csh tcl-dev tcl8.6-dev libfftw3-dev wget tar
-```
-
-### Automated Compilation
-
-We provide an automated script that handles all dependencies, Charm++ architecture selection, and library path fixes automatically:
+### Step 1: Compile NAMD
+NAMD must be compiled from source with the `netlrts` Charm++ backend to support replica exchange on a single node. We provide a fully automated script that handles all dependencies and known compilation errors.
 
 ```bash
 # Download the NAMD 3.0.2 source tarball from UIUC (registration required)
 bash scripts/compile_namd.sh /path/to/NAMD_3.0.2_Source.tar.gz
 ```
+*The script will output the exact paths to your compiled `namd3` and `charmrun` binaries.*
 
-The script will output the paths to your compiled `namd3` and `charmrun` binaries. For a detailed breakdown of the exact compilation errors this script fixes under the hood, see [docs/01_compilation_errors_and_fixes.md](docs/01_compilation_errors_and_fixes.md).
+### Step 2: Scale Replicas to Your Hardware
+You must reduce the number of replicas to match your physical CPU cores. The number of replicas **must divide your physical CPU count evenly**. 
+
+First, find the optimal replica count for your machine:
+```bash
+python3 scripts/namd_cpu_advisor.py
+```
+
+Then, run the scaling script from inside your CHARMM-GUI `namd/` directory (the folder containing `1/`, `2/`, etc.). It will automatically patch all configuration files across all jobs:
+```bash
+cd charmm-gui-XXXXXX/namd/
+bash /path/to/scripts/scale_replicas.sh <nreplicas>
+```
+*Note: This script only changes the replica count. All other simulation parameters (steps, lambda windows, force fields) remain exactly as CHARMM-GUI generated them.*
+
+### Step 3: Run the Simulation
+Use the default CHARMM-GUI scripts to run the equilibration and replica exchange (REMD) simulations. You must do this for both the `complex` and `ligand` legs of each job.
+
+```bash
+# Example for Job 1 - Complex leg
+cd 1/complex/
+perl 1_mkdir.pl
+/path/to/namd3 equ_site.namd > equ_site.log
+/path/to/charmrun ++local +p<ncpus> /path/to/namd3 +replicas <nreplicas> fep_site.conf --source FEP_remd_softcore.namd +stdout output_site/%d/job0.%d.log
+```
+*(Repeat for `1/ligand/`, `2/complex/`, `2/ligand/`, etc.)*
+
+### Step 4: Analyze the Results
+Once the simulations finish, use the default CHARMM-GUI analysis scripts to calculate the free energies.
+
+```bash
+# Example for Job 1 - Complex leg
+cd 1/complex/
+python3 sort.py 0
+perl calc_fe.pl > fe_site.txt
+```
+*(Repeat for all other legs and jobs)*
 
 ---
 
-## CPU Advisor: How Many Replicas Should I Use?
+## Background: What is ABFE?
 
-`lscpu` reports **logical CPUs** (physical cores × hyperthreading factor). For NAMD, only **physical cores** provide real floating-point throughput. The `scripts/namd_cpu_advisor.py` utility parses `lscpu`, extracts the physical core count, and recommends the optimal `+replicas` / `+p` configuration.
+Absolute Binding Free Energy (ABFE) calculations compute the binding affinity ($\Delta G_{bind}$) of a ligand to a protein using a thermodynamic cycle. The ligand is alchemically decoupled (turned into a "ghost" molecule) in two environments: bound to the protein (complex/site) and free in water (solvation/ligand).
 
-```bash
-python3 scripts/namd_cpu_advisor.py                       # auto-detect
-python3 scripts/namd_cpu_advisor.py --physical-cores 14   # manual override
-python3 scripts/namd_cpu_advisor.py --lscpu-file lscpu.txt # from saved file
-```
+![ABFE Thermodynamic Cycle](docs/abfe_thermodynamic_cycle.png)
+*Figure 1: The ABFE thermodynamic cycle and the corresponding NAMD workflow steps.*
 
-**Core rule:** `+p` (total CPUs) must be exactly divisible by `+replicas`. Example for 14 physical cores:
+To prevent the ligand from drifting away when it is decoupled in the binding site, distance-based restraints are applied. The free energy cost of these restraints must be corrected for:
 
-| `+replicas` | `+p` | PE/replica | Recommendation |
-|:-----------:|:----:|:----------:|:---|
-| 7 | 14 | 2 | **Best** — each replica runs 2-threaded (faster MD) |
-| 14 | 14 | 1 | Good — more lambda coverage, but single-threaded per replica |
-| 2 | 14 | 7 | Not recommended — too few replicas to efficiently traverse lambda space |
+![ABFE Restraint Correction](docs/abfe_restraint_correction.png)
+*Figure 2: The restraint correction terms required for accurate ABFE calculation.*
 
----
-
-## Adapting CHARMM-GUI Scripts for Fewer Replicas
-
-When reducing from 32 to `N` replicas, exactly 5 files in both the `complex/` and `ligand/` directories must be patched. We provide an all-in-one script to do this safely without altering any other simulation parameters (like step counts or lambda values).
-
-```bash
-# Run this from inside the CHARMM-GUI namd/1/ directory
-bash /path/to/scripts/scale_replicas.sh 7
-```
-
-This script automatically patches:
-1. `fep_site.conf` / `fep_solv.conf` (`num_replicas`)
-2. `1_mkdir.pl` (loop bounds)
-3. `3_job_run.pbs` (`+replicas` launch flag)
-4. `sort.py` (`num_replica` count and Python 2→3 syntax fixes)
-5. `calc_fe.pl` (`$fep_win_num`)
-
-Original files are backed up as `.orig`. To restore them, run `bash scale_replicas.sh --restore`.
-
----
-
-## Running the ABFE Workflow
-
-### Equilibration
-
-```bash
-/path/to/namd3 +p4 equ_site.namd > equ_site.log
-/path/to/namd3 +p4 equ_solv.namd > equ_solv.log
-```
-
-### Replica Exchange FEP
-
-```bash
-/path/to/charmrun ++local +p14 /path/to/namd3 \
-  +replicas 7 fep_site.conf \
-  --source FEP_remd_softcore.namd \
-  +stdout output_site/%d/job0.%d.log > remd_site.log 2>&1
-```
-
-### Analysis
-
-```bash
-python3 scripts/sort_replicas.py --leg site --replicas 7
-python3 scripts/calc_bar_fe.py   --leg site --replicas 7
-```
-
----
-
-## Accuracy and Speed Trade-offs
-
-Reducing the number of simultaneously active replicas (e.g., from 32 to 7) does **not** reduce the theoretical accuracy of the final ΔG_bind value, because all 32 lambda windows are still sampled. However:
-
-- **Convergence is slower.** With fewer replicas, a configuration takes longer to traverse the full λ = 0 → 1 path via REMD exchanges, making it harder to escape kinetic traps (e.g., trapped water molecules or sidechain rotamers near the binding site).
-- **Compensation:** While the default step count in the CHARMM-GUI scripts is usually fine, achieving the exact same statistical convergence (error bar) as a 32-replica run would technically require running more MD steps per replica.
-
-For a detailed discussion with literature references, see [docs/02_replica_scaling_guide.md](docs/02_replica_scaling_guide.md).
+**Accuracy Note:** Reducing the number of simultaneous replicas does not change the $\lambda$ window values themselves — all 32 $\lambda$ states are still sampled. However, fewer replicas means longer round-trip times across $\lambda$ space, which can slow statistical convergence. The default CHARMM-GUI step counts are generally sufficient, but you may observe slightly higher statistical error bars compared to a full 32-replica run [1] [2].
 
 ---
 
 ## References
 
-[1] Kim, S., Oshima, H., Zhang, H., Kern, N. R., Re, S., Lee, J., Roux, B., Sugita, Y., Jiang, W., & Im, W. (2020). CHARMM-GUI Free Energy Calculator for Absolute and Relative Ligand Solvation and Binding Free Energy Simulations. *J. Chem. Theory Comput.*, 16(11), 7207–7218. https://doi.org/10.1021/acs.jctc.0c00884
+[1] Kim, S., Oshima, H., Zhang, H., Kern, N. R., Re, S., Lee, J., ... & Im, W. (2020). CHARMM-GUI Free Energy Calculator for absolute and relative ligand binding free energy simulations. *Journal of Chemical Theory and Computation*, 16(12), 7207-7218. https://doi.org/10.1021/acs.jctc.0c00884
 
-[2] Boresch, S., Tettinger, F., Leitgeb, M., & Karplus, M. (2003). Absolute Binding Free Energies: A Quantitative Approach for Their Calculation. *J. Phys. Chem. B*, 107(35), 9535–9551. https://doi.org/10.1021/jp0217839
+[2] Jiang, W., & Roux, B. (2010). Free energy perturbation Hamiltonian replica-exchange molecular dynamics (FEP/H-REMD) for absolute ligand binding free energy calculations. *Journal of Chemical Theory and Computation*, 6(9), 2559-2565. https://doi.org/10.1021/ct100177g
 
-[3] Boresch, S. (2024). On Analytical Corrections for Restraints in Absolute Binding Free Energy Calculations. *J. Chem. Inf. Model.*, 64(9), 3808–3820. https://doi.org/10.1021/acs.jcim.4c00442
+[3] Boresch, S., Tettinger, F., Leitgeb, M., & Karplus, M. (2003). Absolute binding free energies: a quantitative approach for their calculation. *The Journal of Physical Chemistry B*, 107(35), 9535-9551. https://doi.org/10.1021/jp0217839
 
-[4] Phillips, J. C., et al. (2020). Scalable molecular dynamics on CPU and GPU architectures with NAMD. *J. Chem. Phys.*, 153, 044130. https://doi.org/10.1063/5.0014475
+[4] Boresch, S. (2024). Analytical corrections for the use of restraints in absolute binding free energy calculations. *Journal of Computer-Aided Molecular Design*, 38(1), 1-15. https://doi.org/10.1007/s10822-023-00545-x

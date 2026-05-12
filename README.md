@@ -12,8 +12,15 @@ This repository provides automated tools to run CHARMM-GUI Absolute Binding Free
 NAMD must be compiled from source with the `netlrts` Charm++ backend to support replica exchange on a single node. We provide a fully automated script that handles all dependencies and known compilation errors.
 
 ```bash
-# Download the NAMD 3.0.2 source tarball from UIUC (registration required)
-bash scripts/compile_namd.sh /path/to/NAMD_3.0.2_Source.tar.gz
+# 1. Download the NAMD 3.0.2 source tarball from UIUC (free registration required):
+#    https://www.ks.uiuc.edu/Development/Download/download.cgi?PackageName=NAMD
+
+# 2. Extract the tarball:
+tar xf NAMD_3.0.2_Source.tar
+
+# 3. cd into the extracted directory and run the script:
+cd NAMD_3.0.2_Source
+bash /path/to/scripts/compile_namd.sh
 ```
 *The script will output the exact paths to your compiled `namd3` and `charmrun` binaries.*
 

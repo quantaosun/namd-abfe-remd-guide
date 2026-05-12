@@ -68,47 +68,16 @@ sudo apt-get update
 sudo apt-get install -y build-essential csh tcl-dev tcl8.6-dev libfftw3-dev wget tar
 ```
 
-### Step 1: Build Charm++ (netlrts backend)
+### Automated Compilation
+
+We provide an automated script that handles all dependencies, Charm++ architecture selection, and library path fixes automatically:
 
 ```bash
-cd NAMD_3.0.2_Source
-tar xf charm-8.0.0.tar
-cd charm-8.0.0
-./build charm++ netlrts-linux-x86_64 --with-production -j4
+# Download the NAMD 3.0.2 source tarball from UIUC (registration required)
+bash scripts/compile_namd.sh /path/to/NAMD_3.0.2_Source.tar.gz
 ```
 
-### Step 2: Configure NAMD
-
-```bash
-cd ../
-cp arch/Linux-x86_64-g++.arch arch/Linux-x86_64-g++-netlrts.arch
-# Edit arch/Linux-x86_64-g++-netlrts.arch and set:
-#   CHARMARCH = netlrts-linux-x86_64
-./config Linux-x86_64-g++-netlrts --with-fftw3 --with-tcl
-```
-
-### Step 3: Fix Make.config and Compile
-
-The pre-built UIUC FFTW/TCL libraries fail to link on modern Ubuntu (missing `-fPIC`). Use system libraries instead. Edit `Linux-x86_64-g++-netlrts/Make.config`:
-
-```
-TCLDIR  = /usr
-TCLINCL = -I/usr/include/tcl8.6
-TCLLIB  = -L/usr/lib/x86_64-linux-gnu -ltcl8.6
-
-FFTDIR  = /usr
-FFTINCL = -I/usr/include
-FFTLIB  = -L/usr/lib/x86_64-linux-gnu -lfftw3f
-```
-
-Then compile:
-
-```bash
-cd Linux-x86_64-g++-netlrts
-make -j4
-```
-
-For a full list of compilation errors encountered and their fixes, see [docs/01_compilation_errors_and_fixes.md](docs/01_compilation_errors_and_fixes.md).
+The script will output the paths to your compiled `namd3` and `charmrun` binaries. For a detailed breakdown of the exact compilation errors this script fixes under the hood, see [docs/01_compilation_errors_and_fixes.md](docs/01_compilation_errors_and_fixes.md).
 
 ---
 
@@ -134,24 +103,21 @@ python3 scripts/namd_cpu_advisor.py --lscpu-file lscpu.txt # from saved file
 
 ## Adapting CHARMM-GUI Scripts for Fewer Replicas
 
-When reducing from 32 to `N` replicas, update these 5 files in both `complex/` and `ligand/` directories:
-
-| File | What to change |
-|:---|:---|
-| `fep_site.conf` / `fep_solv.conf` | `set num_replicas N` and `set num_replicasb N` |
-| `1_mkdir.pl` | Loop upper bound: `for ($j = 0; $j < N; $j++)` |
-| `3_job_run.pbs` | `+replicas N` in the launch command |
-| `sort.py` | `num_replica = N` (also fix Python 2 `print` → Python 3) |
-| `calc_fe.pl` | `$fep_win_num = N` |
-
-Alternatively, use the provided helper script which automatically creates the directories, generates a scaled configuration file on the fly, and launches the REMD job:
+When reducing from 32 to `N` replicas, exactly 5 files in both the `complex/` and `ligand/` directories must be patched. We provide an all-in-one script to do this safely without altering any other simulation parameters (like step counts or lambda values).
 
 ```bash
-# Usage: bash run_abfe_remd.sh <leg> <nreplicas> <ncpus>
-# The script automatically reads all simulation parameters (steps, runs, etc.) 
-# directly from the CHARMM-GUI conf files so you don't have to modify them.
-bash scripts/run_abfe_remd.sh site 7 14
+# Run this from inside the CHARMM-GUI namd/1/ directory
+bash /path/to/scripts/scale_replicas.sh 7
 ```
+
+This script automatically patches:
+1. `fep_site.conf` / `fep_solv.conf` (`num_replicas`)
+2. `1_mkdir.pl` (loop bounds)
+3. `3_job_run.pbs` (`+replicas` launch flag)
+4. `sort.py` (`num_replica` count and Python 2→3 syntax fixes)
+5. `calc_fe.pl` (`$fep_win_num`)
+
+Original files are backed up as `.orig`. To restore them, run `bash scale_replicas.sh --restore`.
 
 ---
 
